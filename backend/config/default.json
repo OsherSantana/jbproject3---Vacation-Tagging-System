@@ -1,7 +1,7 @@
 {
     "app": {
-        "port": "3000",
-        "name": "steimatzky app",
+        "port": "3001",
+        "name": "Vacation Tagging System App",
         "secret": "MySecret",
         "jwtSecret": "MyJwtSecret"
     },
@@ -10,7 +10,7 @@
         "port": 3306,
         "username": "root",
         "password": "",
-        "database": "steimatzky"
+        "database": "vacation_tagging_system"
     },
     "sequelize": {
         "logging": true,

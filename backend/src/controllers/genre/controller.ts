@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import Genre from "../../models/genre";
-import Book from "../../models/book";
+import Genre from "../../models/vacation-tag";
+import Book from "../../models/user";
 
 export async function getAllGenres(req: Request, res: Response, next: NextFunction) {
     try {
