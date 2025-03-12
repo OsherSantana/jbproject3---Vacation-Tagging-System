@@ -1,37 +1,54 @@
-import express, { json } from "express"
-import config from 'config'
-import sequelize from "./db/sequelize"
-import errorLogger from "./middlewares/error/error-logger"
-import errorResponder from "./middlewares/error/error-responder"
-import notFound from "./middlewares/not-found"
-import cors from 'cors'
-import genreRouter from "./routers/genre"
-import bookRouter from "./routers/books"
+import express from "express";
+import config from "config";
+import sequelize from "./db/sequelize";
+import cors from "cors";
+import authRouter from "./routers/auth";
+import vacationRouter from "./routers/vacations";
+import vacationTagRouter from "./routers/vacation-tags";
+import notFound from "./middlewares/not-found";
+import errorLogger from "./middlewares/error/error-logger";
+import errorResponder from "./middlewares/error/error-responder";
 
-const port = config.get<string>('app.port')
-const name = config.get<string>('app.name')
-const force = config.get<boolean>('sequelize.sync.force')
 
 const app = express();
 
-(async () => {
-    await sequelize.sync({ force })
 
-    // middlewares
-    app.use(cors()) // allow any client to use this server
 
-    app.use(json()) // a middleware to extract the post/put/patch data and save it to the request object in case the content type of the request is application/json
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-    // [ here is the place to mount routers on the app]:
-    app.use('/genres', genreRouter)
-    app.use('/books', bookRouter)
+// Serve static files from uploads directory
+app.use('/uploads', express.static('../uploads'));
 
-    // special notFound middleware
-    app.use(notFound)
+// Routes
+app.use('/auth', authRouter);
+app.use('/vacations', vacationRouter);
+app.use('/vacation-tags', vacationTagRouter);
 
-    // error middleware
-    app.use(errorLogger)
-    app.use(errorResponder)
+// Error handling middleware
+app.use(notFound);
+app.use(errorLogger);
+app.use(errorResponder);
 
-    app.listen(port, () => console.log(`${name} started on port ${port}...`))
-})()
+const port = config.get<string>('app.port');
+const appName = config.get<string>('app.name');
+
+async function start() {
+    try {
+        // Sync database models with database
+        const force = config.get<boolean>('sequelize.sync.force');
+        await sequelize.sync({ force });
+        console.log('Database synced successfully');
+
+        // Start server
+        app.listen(port, () => {
+            console.log(`${appName} is running on port ${port}`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+}
+
+start();

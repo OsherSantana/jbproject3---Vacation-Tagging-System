@@ -5,11 +5,14 @@ import { StatusCodes } from "http-status-codes";
 
 export default function validation(validator: ObjectSchema) {
     return async function (req: Request, res: Response, next: NextFunction) {
+        console.log('Request body before validation:', req.body);
         try {
-            req.body = await validator.validateAsync(req.body)
-            next()
-        } catch (e) {
-            next(new AppError(StatusCodes.UNPROCESSABLE_ENTITY, e.message))
+            req.body = await validator.validateAsync(req.body);
+            console.log('Request body after validation:', req.body);
+            next();
+        } catch (e: any) {
+            console.log('Validation error:', e.message);
+            next(new AppError(StatusCodes.UNPROCESSABLE_ENTITY, e.message));
         }
     }
 }
